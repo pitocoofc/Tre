@@ -1,917 +1,719 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ghost-NDJ Reborn</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --danger: #ef4444;
+            --glass: rgba(255, 255, 255, 0.06);
+            --glass-heavy: rgba(10, 10, 14, 0.96);
+            --text-color: #ffffff;
+            --bg-color: #050508;
+            --bg-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop');
+            --border: rgba(255, 255, 255, 0.1);
+        }
 
-  
-<!DOCTYPE html>    
-<html lang="pt-br">    
-<head>    
-    <meta charset="UTF-8">    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
-    <title>Ndj-AI Premium | Evolution v0.2</title>    
-    <style>    
-        :root {    
-            --bg-primary: #0a0a0a;    
-            --accent-color: #ffffff;    
-            --glass-bg: rgba(255, 255, 255, 0.05);    
-            --text-main: #e0e0e0;    
-            --ai-bubble: #1a1a1a;    
-            --user-bubble: #ffffff;    
-        }    
-    
-        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }    
-        body, html { height: 100%; width: 100%; overflow: hidden; background-color: var(--bg-primary); font-family: 'Inter', -apple-system, sans-serif; }    
-    
-        /* IFRAME SPLASH IPTVEEN */    
-        #splash-wrapper {    
-            position: fixed; inset: 0; z-index: 5000;    
-            background: #000; display: flex; align-items: center; justify-content: center;    
-            transition: opacity 0.8s ease;    
-        }    
-        #splash-frame {    
-            width: 100%; height: 100%; border: none;    
-            animation: softPulse 2s infinite ease-in-out;    
-        }    
-    
-        @keyframes softPulse {    
-            0%, 100% { opacity: 0.4; transform: scale(1); }    
-            50% { opacity: 1; transform: scale(1.02); }    
-        }    
-    
-.file-menu-wrapper {  
-    position: relative;  
-    display: flex;  
-    align-items: center;  
-}  
-  
-.file-btn {  
-    background: #1f1f1f;  
-    border: 1px solid #333;  
-    color: #fff;  
-    font-size: 18px;  
-    padding: 10px;  
-    border-radius: 10px;  
-    cursor: pointer;  
-    transition: 0.2s;  
-}  
-  
-.file-btn:hover {  
-    background: #2a2a2a;  
-    transform: scale(1.05);  
-}  
-  
-/* MENU */  
-#file-menu {  
-    position: absolute;  
-    bottom: 55px;  
-    left: 0;  
-    width: 180px;  
-    background: #161616;  
-    border: 1px solid #333;  
-    border-radius: 12px;  
-    display: none;  
-    flex-direction: column;  
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);  
-    overflow: hidden;  
-}  
-  
-.file-option {  
-    padding: 12px;  
-    color: #aaa;  
-    cursor: pointer;  
-    transition: 0.2s;  
-    font-size: 0.85rem;  
-}  
-  
-.file-option:hover {  
-    background: #222;  
-    color: #fff;  
-}  
-  
-  /* MODO VOZ OVERLAY */
-#voice-mode-screen {
-    position: fixed; inset: 0; background: #000; z-index: 8000;
-    display: none; flex-direction: column; align-items: center; justify-content: center;
-    transition: 0.5s;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-.ai-circle {
-    width: 150px; height: 150px; border-radius: 50%;
-    background: #00ff88; /* Verde por padrão */
-    box-shadow: 0 0 50px #00ff8888;
-    transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    animation: voicePulse 2s infinite ease-in-out;
-}
+        body {
+            background: var(--bg-color);
+            background-image: var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            overflow: hidden;
+        }
 
-.ai-circle.listening { background: #00ff88; box-shadow: 0 0 60px #00ff88; }
-.ai-circle.thinking { background: #ffaa00; box-shadow: 0 0 60px #ffaa00; }
-.ai-circle.speaking { background: #ff4b4b; box-shadow: 0 0 60px #ff4b4b; }
+        /* HUB DE ENTRADA (Tela Inicial) */
+        #home-hub {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(rgba(5, 5, 8, 0.75), rgba(5, 5, 8, 0.85)), var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
 
-@keyframes voicePulse {
-    0%, 100% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.1); opacity: 1; }
-}
+        /* NAVEGADOR (Iframe incorporado adaptado com margem da topbar) */
+        #browser-frame {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 60px);
+            border: none;
+            background: #fff;
+            display: none;
+            z-index: 5;
+        }
 
-.voice-status { color: #fff; margin-top: 30px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem; }
+        /* TOPBAR DO NAVEGADOR ATIVO */
+        .topbar {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            height: 60px;
+            display: none; 
+            align-items: center;
+            padding: 0 15px;
+            background: #111115;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
 
-.exit-voice-btn {
-    position: absolute; bottom: 50px; background: rgba(255,255,255,0.1);
-    border: 1px solid #333; color: #fff; padding: 15px 30px; border-radius: 30px;
-    cursor: pointer;
-}
+        .url-container {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            padding: 5px 15px;
+            margin-right: 10px;
+        }
 
-  
-        /* UI PRINCIPAL */    
-        #main-chat-screen {    
-            position: fixed; inset: 0; display: none; flex-direction: column;    
-            background: linear-gradient(180deg, #111 0%, #000 100%);    
-            opacity: 0; transform: translateY(10px);    
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);    
-        }    
-        #main-chat-screen.active { opacity: 1; transform: translateY(0); }    
-    
-        /* HEADER & MODEL SELECTOR */    
-        #chat-header {    
-            padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);    
-            display: flex; flex-direction: column; align-items: center; gap: 5px;    
-            cursor: pointer; position: relative; z-index: 3000;    
-        }    
-        #app-name { color: #fff; font-weight: 600; font-size: 1.1rem; letter-spacing: 1px; }    
-        #current-model-tag {     
-            font-size: 0.7rem; color: #888; text-transform: uppercase;     
-            background: var(--glass-bg); padding: 2px 8px; border-radius: 4px;    
-        }    
-    
-        /* PAINEL DE MODELOS */    
-        #model-panel {    
-            position: absolute; top: 75px; width: 220px;    
-            background: #161616; border: 1px solid #333; border-radius: 12px;    
-            padding: 8px; display: none; flex-direction: column; gap: 5px;    
-            box-shadow: 0 15px 40px rgba(0,0,0,0.7);    
-        }    
-        .model-option {    
-            padding: 12px; border-radius: 8px; color: #aaa; font-size: 0.85rem;    
-            transition: 0.2s; cursor: pointer; border-left: 3px solid transparent;    
-        }    
-        .model-option:hover { background: #222; color: #fff; }    
-        .model-option.selected { border-left-color: #fff; background: #222; color: #fff; }    
-    
-        /* ÁREA DE CHAT */    
-        #chat-box { flex: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }    
+        .url-static-prefix { color: #666; font-size: 14px; margin-right: 2px; font-family: monospace; }
+
+        .url-input-field {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--text-color);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .menu-trigger {
+            font-size: 26px;
+            color: var(--text-color);
+            cursor: pointer;
+            font-weight: bold;
+            width: 38px; height: 38px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+        }
+        .menu-trigger:hover { background: var(--glass); }
+
+        /* DROPDOWN DOS 3 PONTINHOS */
+        .dropdown {
+            position: absolute;
+            top: 65px; right: 15px;
+            background: #111115;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+            width: 220px;
+            overflow: hidden;
+            z-index: 3000;
+        }
+
+        .dropdown-item {
+            padding: 14px 15px;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        .dropdown-item:hover { background: var(--primary); color: white; }
+
+        .settings-trigger {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 18px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: 0.2s;
+        }
+        .settings-trigger:hover { background: rgba(255,255,255,0.15); transform: rotate(45deg); }
+
+        .branding {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo-img {
+            width: 75px;
+            height: 75px;
+            border-radius: 22px;
+            margin-bottom: 15px;
+            animation: pulse 3s infinite ease-in-out;
+            box-shadow: 0 0 20px var(--primary);
+            object-fit: cover;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.06); opacity: 1; box-shadow: 0 0 35px var(--primary); }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        .branding h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .main-container {
+            width: 90%;
+            max-width: 550px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            padding: 6px 10px;
+            border-radius: 50px;
+            width: 100%;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+        .search-box:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        #url-input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: white;
+            padding: 12px 15px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-btn {
+            background: var(--primary);
+            border: none;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+        .search-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
+
+        /* SHORTCUTS */
+        .shortcuts {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 100%;
+        }
+
+        .shortcut-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .shortcut-item:hover { transform: translateY(-3px); }
+
+        .icon-circle {
+            width: 55px;
+            height: 55px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            border: 1px solid var(--border);
+        }
+
+        /* MODAIS */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--glass-heavy);
+            backdrop-filter: blur(20px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #0f0f14;
+            border: 1px solid var(--border);
+            padding: 30px;
+            border-radius: 24px;
+            max-width: 460px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.7);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .typewriter-text {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #00ff41;
+            margin-bottom: 25px;
+            min-height: 45px;
+            line-height: 1.4;
+        }
+
+        /* CONFIGURAÇÃO */
+        .config-group { margin-bottom: 18px; }
+        .config-group label { display: block; font-size: 11px; color: #888; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;}
+        .config-group input[type="text"], .config-group select {
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 10px; color: white; outline: none; font-size: 14px;
+        }
+        .config-group input[type="color"] {
+            width: 100%; height: 42px; border: 1px solid var(--border); border-radius: 10px; background: transparent; cursor: pointer;
+        }
+        .file-custom {
+            display: block; width: 100%; padding: 12px; background: rgba(255,255,255,0.03); border: 1px dashed var(--border); text-align: center; border-radius: 10px; cursor: pointer; font-size: 13px; color: #aaa;
+        }
+        .file-custom:hover { border-color: var(--primary); color: #fff; }
+
+        .shortcut-manager-list {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 10px;
+            margin-top: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .shortcut-manager-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 13px;
+        }
+        .shortcut-manager-item:last-child { border: none; }
+        .del-shortcut-btn { color: var(--danger); cursor: pointer; background: none; border: none; font-size: 16px; }
+
+        .add-shortcut-row {
+            display: flex; gap: 8px; margin-top: 10px;
+        }
+        .add-shortcut-row input { flex: 1; }
+        .add-shortcut-btn { background: var(--primary); border: none; color: white; padding: 0 12px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="settings-trigger" onclick="toggleModal('settings-modal', true)">⚙️</div>
+
+    <div class="topbar" id="topbar">
+        <div class="url-container">
+            <span class="url-static-prefix" id="urlPrefix">ghostsearch.gt/</span>
+            <input class="url-input-field" id="urlbar" onkeydown="handleBar(event)">
+        </div>
+        <div class="menu-trigger" onclick="toggleMenu(event)">⋮</div>
+
+        <div class="dropdown" id="menuDropdown">
+            <div class="dropdown-item" onclick="goBack()"><span>⬅️</span> Voltar Página</div>
+            <div class="dropdown-item" onclick="goHome()"><span>🏠</span> Ir para Home</div>
+            <div class="dropdown-item" onclick="openLocalFile()"><span>📄</span> Arquivo Local (ia.html)</div>
+            <div class="dropdown-item" onclick="sharePage()"><span>📤</span> Compartilhar Link</div>
+            <div class="dropdown-item" onclick="toggleModal('settings-modal', true)" style="border-top:1px solid var(--border); color:var(--primary);"><span>⚙️</span> Configurações</div>
+        </div>
+    </div>
+
+    <div id="home-hub">
+        <div class="branding">
+            <img src="https://cdn-icons-png.flaticon.com/512/64/64571.png" id="hub-logo" class="logo-img">
+            <h1 id="hub-title">Ghost-NDJ Reborn</h1>
+        </div>
+
+        <div class="main-container">
+            <div class="search-box">
+                <input type="text" id="url-input" placeholder="Pesquisar anonimamente ou digitar link..." onkeydown="checkEnter(event)">
+                <button class="search-btn" onclick="navigate()">➔</button>
+            </div>
+
+            <div class="shortcuts" id="shortcuts-display"></div>
+        </div>
+    </div>
+
+    <iframe id="browser-frame" src="about:blank"></iframe>
+
+    <div class="modal-overlay" id="security-modal">
+        <div class="modal-content">
+            <h2 style="color:var(--danger); margin-bottom:10px; font-size: 18px;">⚠️ PROTOCOLO DE CONEXÃO EXTERNA</h2>
+            <div class="typewriter-text" id="modalDesc"></div>
+            <div style="display:flex; gap:10px;">
+                <button onclick="toggleModal('security-modal', false)" style="flex:1; padding:12px; background:#222; color:#fff; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Abortar</button>
+                <button id="btnProceed" style="flex:1; padding:12px; background:var(--danger); color:#fff; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Proceder</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Customização Externa</h2>
+                <button onclick="toggleModal('settings-modal', false)" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">✕</button>
+            </div>
             
-        .msg { max-width: 85%; padding: 14px 18px; border-radius: 20px; font-size: 0.95rem; line-height: 1.5; animation: fadeIn 0.4s ease; }    
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }    
-    
-        .user-msg { align-self: flex-end; background: var(--user-bubble); color: #000; border-bottom-right-radius: 4px; }    
-        .ai-msg { align-self: flex-start; background: var(--ai-bubble); color: var(--text-main); border: 1px solid #333; border-bottom-left-radius: 4px; }    
-    
-  
-        /* FOOTER INPUT */    
-        #chat-footer { padding: 20px; background: transparent; }    
-     .input-wrapper {     
+            <div class="config-group">
+                <label>Cor de Destaque (Accent)</label>
+                <input type="color" id="cfgPrimary" onchange="updateThemePreview()">
+            </div>
 
-            display: flex; align-items: center; background: #161616;     
-            border-radius: 18px; padding: 6px 16px; border: 1px solid #252525;    
-            transition: 0.3s;    
-        }    
-        .input-wrapper:focus-within { border-color: #555; background: #1a1a1a; }    
-        #chatInput { flex: 1; border: none; background: transparent; color: #fff; padding: 12px; font-size: 0.95rem; }    
-            @keyframes wave {
-    0% { box-shadow: 0 0 0px #ff4b4b; }
-    50% { box-shadow: 0 0 15px #ff4b4b; }
-    100% { box-shadow: 0 0 0px #ff4b4b; }
-}
+            <div class="config-group">
+                <label>Plano de Fundo (Imagem da Galeria)</label>
+                <label class="file-custom">
+                    <span id="file-label">📁 Escolher imagem do dispositivo...</span>
+                    <input type="file" id="cfgBgGallery" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
+                </label>
+            </div>
 
-.input-gravando {
-    animation: wave 1s infinite;
-    border-color: #ff4b4b !important;
-}
+            <div class="config-group">
+                <label>Motor de Busca do Browser</label>
+                <select id="cfgSearchEngine">
+<optgroup label="Recomendados⭐">
+                    <option value="ghost">SearXNG</option>
+<option value="swiss">Swisscows(Esse Motor pode ser lento)</option>
+<option value="marginala">Marginala(Esse Motor pode ser lento)</option>
+<option value="yep">Yep(Esse Motor pode ser lento)</option>
+<option value="bing">Bing</option>
+<option value="kiddle">Kiddle</option>
+</optgroup>
 
-.input-wrapper.gravando {
-    animation: wave 1s infinite ease-in-out;
-    border-color: #ff4b4b !important;
-    background: #1a0a0a; /* Um tom avermelhado sutil */
-}
+<optgroup label="Wikipédia🗃️">
+                    <option value="wikipedia">Wikipédia</option>
+                    <option value="wikitionarypt">WikiTionary(PT)</option>
+                    <option value="wikitionaryen">WikiTionary(EN)</option>
+<option value="wikilivroen">WikiLivro(EN)</option>
+<option value="wikilivropt">WikiLivro(PT)</option>
+<option value="wikiversityen">WikiVersity(EN)</option>
+<option value="wikiversitypt">WikiVersity(PT)</option>
+<option value="specieswikimedia">SpeciesWikimedia</option>
+<option value="wikidata">WikiData</option>
+</optgroup>
 
 
+<optgroup label="Outros">
+                    <option value="archiver">Archive.org</option>
+                    <option value="gutenberg">Gutenberg</option>
+                    <option value="algolia">Algolia</option>
+</optgroup>
+                </select>
+            </div>
 
-        #sendBtn {     
-            background: transparent; color: #fff; border: none;     
-            cursor: pointer; padding: 5px; transition: 0.2s;    
-        }    
-        #sendBtn:hover { transform: scale(1.1); color: #00ff88; }    
-    
-#micBtn {
-    background: transparent;
-    border: none;
-    color: #888;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    transition: 0.3s;
-}
+            <div class="config-group" style="margin-top: 25px;">
+                <label>Gerenciar Atalhos Rápidos</label>
+                <div class="shortcut-manager-list" id="shortcut-manager-list"></div>
+                <div class="add-shortcut-row">
+                    <input type="text" id="new-short-name" placeholder="Nome" style="padding: 8px; background: #000; border: 1px solid var(--border); color:#fff; border-radius:6px; font-size:12px;">
+                    <input type="text" id="new-short-url" placeholder="URL" style="padding: 8px; background: #000; border: 1px solid var(--border); color:#fff; border-radius:6px; font-size:12px;">
+                    <button class="add-shortcut-btn" onclick="addNewShortcut()">Add</button>
+                </div>
+            </div>
 
-#micBtn:hover {
-    color: #fff;
-    transform: scale(1.1);
-}
+            <div style="display:flex; gap:10px; margin-top:30px;">
+                <button onclick="toggleModal('settings-modal', false)" style="flex:1; padding:12px; background:#181822; color:#fff; border:none; border-radius:10px; cursor:pointer;">Cancelar</button>
+                <button onclick="saveConfigurations()" style="flex:1; padding:12px; background:var(--primary); color:#fff; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Aplicar Tudo</button>
+            </div>
+        </div>
+    </div>
 
-  
-        /* BOTÃO DE CÓDIGO */    
-        .view-code-btn {     
-            background: #333; color: #fff; border: none; padding: 8px 14px;     
-            border-radius: 8px; margin-top: 12px; cursor: pointer; font-size: 0.75rem;     
-            display: block; width: fit-content; transition: 0.2s;    
-        }    
-        .view-code-btn:hover { background: #444; }    
-    
-        /* MODAL DE CÓDIGO */    
-        #code-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 6000; display: none; align-items: center; justify-content: center; padding: 20px; }    
-        .modal-content { background: #111; border: 1px solid #333; border-radius: 15px; width: 100%; max-width: 600px; padding: 25px; box-shadow: 0 0 50px rgba(0,0,0,1); }    
-        #modal-code-text { font-family: 'Consolas', monospace; color: #a9ffaf; font-size: 0.85rem; white-space: pre-wrap; margin-bottom: 20px; max-height: 400px; overflow-y: auto; }    
-        .close-btn { background: #fff; color: #000; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }    
-    </style>    
-</head>    
-<body onload="startSequence()">    
-    
-  
-  
-        <div id="editor-modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 7000; display: none; align-items: center; justify-content: center; padding: 15px;">    
-    <div class="modal-content" style="max-width: 90%; height: 80vh; display: flex; flex-direction: column;">    
-        <h3 style="color: #fff; margin-bottom: 15px; font-size: 1rem;">Editando: <span id="editor-filename" style="color: #00ff88;"></span></h3>  
-        <textarea id="editor-textarea" style="flex: 1; background: #050505; color: #a9ffaf; border: 1px solid #333; border-radius: 8px; padding: 15px; font-family: 'Consolas', monospace; font-size: 0.9rem; resize: none;"></textarea>  
-        <div style="display: flex; gap: 10px; margin-top: 15px;">  
-            <button class="close-btn" onclick="salvarEFecharEditor()" style="background: #00ff88; flex: 1;">Salvar e Baixar</button>    
-            <button class="close-btn" onclick="fecharEditor()" style="background: #333; color: #fff;">Cancelar</button>    
-        </div>  
-    </div>    
-</div>  
+    <script>
+        const hub = document.getElementById('home-hub');
+        const frame = document.getElementById('browser-frame');
+        const input = document.getElementById('url-input');
+        const topbar = document.getElementById('topbar');
 
-<div id="voice-mode-screen">
-    <div id="status-circle" class="ai-circle"></div>
-    <div id="voice-status-text" class="voice-status">Aguardando...</div>
-    <button class="exit-voice-btn" onclick="toggleVoiceMode(false)">Encerrar Conversa</button>
-</div>
+        let currentEngine = "ghost";
+        let base64BgData = "";
 
-  
-  
-    <div id="splash-wrapper">    
-        <iframe id="splash-frame" src="about:blank"></iframe>    
-    </div>    
-    
-    <div id="main-chat-screen">    
-  <div id="chat-header">    
-    <div id="app-name">Ndj-AI</div>
-    <button onclick="toggleVoiceMode(true)" style="background: rgba(255,255,255,0.05); border: 1px solid #333; color: #00ff88; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; cursor: pointer; margin-top: 5px;">
-        📡 MODO IMERSIVO
-    </button>
-    
-    <div id="current-model-tag" onclick="toggleModelPanel()">Modelo: Padrão (v1)</div>    
+        const ENGINES = {
+            ghost: "https://g-jxlf.onrender.com/search?q=",
+            swiss: "https://swisscows.com/web?query=",
+            yep: "https://yep.com/web?q=",
+            kiddle: "https://www.kiddle.co/ms.php?q=",
+            algolia: "https://hn.algolia.com/?query=",
+            wikipedia: "https://www.wikipedia.org/wiki/",
+            marginala: "https://search.marginalia.nu/search?query=",
+            archiver: "https://archive.org/search?query=",
+            wikidata: "https://www.wikidata.org/w/index.php?search=",
+            wikiversitypt: "https://pt.wikiversity.org/w/index.php?title=Especial:Pesquisar&go=Go&search=",
+            wikiversityen: "https://en.wikiversity.org/w/index.php?title=Especial:Pesquisar&go=Go&search=",
+            wikilivropt: "https://pt.wikibooks.org/w/index.php?search=",
+            wikilivroen: "https://en.wikibooks.org/w/index.php?search=",
+            wikitionarypt: "https://pt.wiktionary.org/wiki/",
+            wikitionaryen: "https://en.wiktionary.org/wiki/",
+            gutenberg: "https://www.gutenberg.org/ebooks/search/?query=",
+           specieswikimedia: "https://species.wikimedia.org/wiki/",
+            bing: "https://www.bing.com/search?q="
+        };
+
+        const SAFE_DOMAINS = ["g-jxlf.onrender.com", "wikipedia.org", "github.com", "google.com", "youtube.com", "developer.mozilla.org", "pitocoofc.github.io", "nexoraofc.github.io", "nexoraincofc.github.io"];
         
-    <div id="model-panel">    
-        <div class="model-option selected" onclick="selectModel('v1', 'Padrão (v1)')">Ndj-Core v1</div>    
-        <div class="model-option" onclick="selectModel('v2', 'Experimental (v2)')">Ndj-Neo v2</div>    
-        <div class="model-option" onclick="selectModel('creative', 'Criativo')">Creative-Flow</div>    
-    </div>    
-</div>
+        let defaultShortcuts = [
+            { name: "SearXNG", url: "https://g-jxlf.onrender.com/search?q=", icon: "🌍" },
+            { name: "Wikipédia", url: "https://pt.wikipedia.org/", icon: "🗃️"},
+            { name: "bing", url: "https://www.bing.com/search?q=home", icon: "🌐" }
+        ];
+        let userShortcuts = [];
 
-    
-        <div id="chat-box"></div>    
-    
-        <div id="chat-footer">  
+        window.onload = function() {
+            loadSavedSettings();
+            renderShortcuts();
+        };
 
-<button id="micBtn" onclick="toggleMic()">
-            <svg id="micIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
-            </svg>
-        </button>
-
-    <div class="input-wrapper">  
-<div class="file-menu-wrapper">  
-      
-    <button class="file-btn" onclick="toggleFileMenu()">📎</button>  
-  
-    <div id="file-menu">  
-        <div class="file-option" onclick="selectFileType('txt')">📄 Arquivo TXT</div>  
-        <div class="file-option" onclick="selectFileType('html')">🌐 Arquivo HTML</div>  
-<div class="file-option" onclick="ativarInterfaceV2()" style="color: #00ff88; border-top: 1px solid #333; margin-top: 5px; padding-top: 15px;">🚀 Carregar v2 (Modular)</div>
-    </div>  
-  
-    <input type="file" id="fileInput" style="display:none" onchange="handleFile(this)">  
-</div>  
-        <!-- INPUT -->  
-        <input type="text" id="chatInput" placeholder="Pergunte algo..." onkeypress="if(event.key==='Enter') sendMessage()">  
-  
-        <!-- ENVIAR -->  
-        <button id="sendBtn" onclick="sendMessage()">  
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">  
-                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>  
-            </svg>  
-        </button>  
-  
-    </div>  
-</div>  
-    
-    <div id="code-modal">    
-        <div class="modal-content">    
-            <div id="modal-code-text"></div>    
-            <button class="close-btn" onclick="closeModal()">Fechar</button>    
-        </div>    
-    </div>    
-    
-    <script>  
-let currentPath = "v1";  
-  
-let selectedFileType = null;  
-let arquivoTemporario = { nome: "", conteudo: [], ativo: false };   
-  
-let recognition;
-let isListening = false;
-
-let timerInterval;
-let segundos = 0;
-
-// Referências globais
-const inputWrapper = document.querySelector('.input-wrapper');
-const chatInput = document.getElementById('chatInput');
-
-// INICIAR GRAVAÇÃO (Segurando)
-micBtn.addEventListener('mousedown', () => {
-    if (!recognition) return;
-    
-    segundos = 0;
-    chatInput.value = ""; // Limpa o campo para a nova voz
-    chatInput.placeholder = "Gravando: 00:00";
-    micBtn.style.color = "#ff4b4b";
-    inputWrapper.classList.add('gravando'); // 👈 ATIVA A ONDA AQUI
-    
-    try {
-        recognition.start();
-        timerInterval = setInterval(() => {
-            segundos++;
-            chatInput.placeholder = `Gravando: ${formatarTempo(segundos)}`;
-        }, 1000);
-    } catch(e) { console.log("Mic já ativo"); }
-});
-
-// FINALIZAR E ENVIAR (Soltando)
-micBtn.addEventListener('mouseup', () => {
-    clearInterval(timerInterval);
-    chatInput.placeholder = "Pergunte algo...";
-    micBtn.style.color = "#888";
-    inputWrapper.classList.remove('gravando'); // 👈 DESATIVA A ONDA AQUI
-    
-    recognition.stop();
-    
-    // Pequeno delay para o Speech Recognition processar a última palavra
-    setTimeout(() => {
-        if(chatInput.value.trim() !== "") {
-            sendMessage(); 
+        function toggleMenu(e) {
+            e.stopPropagation();
+            const m = document.getElementById("menuDropdown");
+            m.style.display = m.style.display === "flex" ? "none" : "flex";
         }
-    }, 600); 
-});
 
-// Segurança: Se o mouse sair do botão enquanto segura, para a gravação
-micBtn.addEventListener('mouseleave', () => {
-    if (inputWrapper.classList.contains('gravando')) {
-        micBtn.dispatchEvent(new Event('mouseup'));
-    }
-});
+        window.onclick = (e) => { 
+            if(!e.target.matches('.menu-trigger')) document.getElementById("menuDropdown").style.display = "none"; 
+        }
 
-if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SpeechRecognition();
-    recognition.lang = 'pt-BR';
-    recognition.continuous = false; // Para quando você termina de falar
-    recognition.interimResults = true; // Mostra o texto "nascendo"
+        function typeWrite(text, elementId) {
+            const el = document.getElementById(elementId);
+            el.innerHTML = ""; let i = 0;
+            function type() {
+                if (i < text.length) { el.innerHTML += text.charAt(i); i++; setTimeout(type, 15); }
+            }
+            type();
+        }
 
-    recognition.onresult = (event) => {
-        const result = event.results[0][0].transcript;
-        document.getElementById('chatInput').value = result;
-    };
+        function openPage(url, title) {
+            const load = () => {
+                frame.src = url;
+                frame.style.display = 'block';
+                topbar.style.display = 'flex';
+                hub.style.opacity = '0';
+                setTimeout(() => { hub.style.display = 'none'; }, 400);
 
-    recognition.onend = () => {
-        isListening = false;
-        document.getElementById('micIcon').style.color = "#888";
-    };
-
-    recognition.onerror = (err) => {
-        console.error("Erro no mic:", err.error);
-        isListening = false;
-        document.getElementById('micIcon').style.color = "#888";
-    };
-}
-
-function toggleMic() {
-    if (!recognition) {
-        addMsg("⚠️ Seu navegador não suporta comandos de voz.", "ai-msg");
-        return;
-    }
-
-    if (isListening) {
-        recognition.stop();
-    } else {
-        recognition.start();
-        isListening = true;
-        document.getElementById('micIcon').style.color = "#ff4b4b"; // Fica vermelho gravando
-    }
-}
-
-function toggleFileMenu() {  
-    const menu = document.getElementById('file-menu');  
-    menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';  
-}  
-  
-function selectFileType(type) {  
-    selectedFileType = type;  
-  
-    document.getElementById('file-menu').style.display = 'none';  
-  
-    const input = document.getElementById('fileInput');  
-  
-    if (type === 'txt') input.accept = ".txt";  
-    if (type === 'html') input.accept = ".html";  
-  
-    input.click();  
-}  
-  
-// NORMALIZA TEXTO  
-function normalizar(texto) {  
-    return texto  
-        .toLowerCase()  
-        .normalize("NFD")  
-        .replace(/[\u0300-\u036f]/g, "")  
-        .replace(/(.)\1+/g, "$1")  
-        .replace(/[^\w\s]/g, "")  
-        .trim();  
-}  
-  
-// TRADUZ FRASE → EXPRESSÃO  
-function traduzirCalculo(texto) {  
-    let t = texto.toLowerCase();  
-  
-    t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");  
-  
-    const nums = {  
-        "zero":0,"um":1,"dois":2,"tres":3,"quatro":4,  
-        "cinco":5,"seis":6,"sete":7,"oito":8,"nove":9,"dez":10  
-    };  
-  
-    for (let n in nums) {  
-        t = t.replace(new RegExp(`\\b${n}\\b`, "g"), nums[n]);  
-    }  
-  
-    t = t.replace(/mais/g, "+");  
-    t = t.replace(/menos/g, "-");  
-    t = t.replace(/vezes|x|×/g, "*");  
-    t = t.replace(/dividido por|dividido|÷/g, "/");  
-  
-    const match = t.match(/[\d\.\+\-\*\/\(\)]+/g);  
-    if (!match) return null;  
-  
-    const expressao = match.join("");  
-  
-    if (/^[0-9+\-*/().]+$/.test(expressao) && /[\+\-\*\/]/.test(expressao)) {  
-        try {  
-            const resultado = Function(`return ${expressao}`)();  
-            return `${expressao} = ${resultado}`;  
-        } catch {  
-            return null;  
-        }  
-    }  
-  
-    return null;  
-}  
-  
-// BOOT  
-function startSequence() {  
-    setTimeout(() => {  
-        const splash = document.getElementById('splash-wrapper');  
-        const main = document.getElementById('main-chat-screen');  
-          
-        splash.style.opacity = '0';  
-        setTimeout(() => {  
-            splash.style.display = 'none';  
-            main.style.display = 'flex';  
-            setTimeout(() => main.classList.add('active'), 50);  
-            addMsg("Conexão estável. Sou a Ndj-AI, como posso te ajudar hoje?", "ai-msg");  
-        }, 800);  
-    }, 2500);  
-}  
-  
-// UI  
-function toggleModelPanel() {  
-    const panel = document.getElementById('model-panel');  
-    panel.style.display = (panel.style.display === 'flex') ? 'none' : 'flex';  
-}  
-  
-function selectModel(path, label) {  
-    currentPath = path;  
-    document.getElementById('current-model-tag').textContent = `Modelo: ${label}`;  
-    document.querySelectorAll('.model-option').forEach(opt => {  
-        opt.classList.remove('selected');  
-        if(opt.textContent.includes(label)) opt.classList.add('selected');  
-    });  
-    addMsg(`Modelo alterado para: ${label}. Buscando em /${path}`, 'ai-msg');  
-}  
-  
-function addTyping() {  
-    const box = document.getElementById('chat-box');  
-    const m = document.createElement('div');  
-    m.className = 'msg ai-msg';  
-    m.id = 'typing-msg';  
-    m.textContent = 'Digitando...';  
-    box.appendChild(m);  
-    box.scrollTop = box.scrollHeight;  
-}  
-  
-function removeTyping() {  
-    const t = document.getElementById('typing-msg');  
-    if (t) t.remove();  
-}  
-  
-// MENSAGEM  
-async function sendMessage() {  
-    const input = document.getElementById('chatInput');  
-    const rawText = input.value.trim();  
-    if (!rawText) return;  
-  
-    addMsg(rawText, 'user-msg');  
-input.value = "";  
-  
-  
-  
-addTyping(); // 👈 AQUI  
-// Intercepta comandos de edição antes de buscar resposta no JSON  
-const acaoEditor = processarEdicao(rawText);  
-if (acaoEditor) {  
-    setTimeout(() => {  
-        removeTyping();  
-        addMsg("📝 " + acaoEditor, "ai-msg");  
-    }, 500);  
-    return; // Encerra a função aqui para não dar erro no fetch  
-}  
-  
-  
-    const calc = traduzirCalculo(rawText);  
-    const textoLower = rawText.toLowerCase();  
-  
-    const soConta = /^[\d\s+\-*/().]+$/.test(textoLower);  
-    const perguntaMath = /(quanto|calcule|resultado|resolve)/.test(textoLower);  
-  
-    // 🚀 PRIORIDADE TOTAL PRA CONTA  
-    if (calc && (soConta || perguntaMath)) {  
-    setTimeout(() => {  
-        removeTyping(); // 👈 IMPORTANTE  
-        addMsg("🧠 " + calc, "ai-msg");  
-    }, 400);  
-    return;  
-}  
-  
-    let resultadoConta = calc || null;  
-    const userText = normalizar(rawText);  
-  
-    try {  
-        const response = await fetch(`https://raw.githubusercontent.com/pitocoofc/jt/main/modelos/${currentPath}/respostas.json`);  
-        const data = await response.json();  
-          
-        let responseToUser = "";  
-        let codeToUser = null;  
-        let found = false;  
-  
-        for (let keyGroup in data.keywords) {  
-            const keys = keyGroup.split(',').map(k => normalizar(k));  
-  
-            if (keys.some(k => userText === k || userText.includes(k))) {  
-                const item = data.keywords[keyGroup];  
-                  
-                if (item.texto.includes(';')) {  
-                    const frases = item.texto.split(';').map(f => f.trim());  
-                    responseToUser = frases[Math.floor(Math.random() * frases.length)];  
-                } else {  
-                    responseToUser = item.texto;  
-                }  
-                  
-                codeToUser = item.codigo || null;  
-                found = true;  
-                break;   
-            }  
-        }  
-  
-        if (!found) {  
-            if (data.fallback.includes(';')) {  
-                const fbs = data.fallback.split(';').map(f => f.trim());  
-                responseToUser = fbs[Math.floor(Math.random() * fbs.length)];  
-            } else {  
-                responseToUser = data.fallback;  
-            }  
-        }  
-  
-        setTimeout(() => {  
-    removeTyping(); // 👈 ESSENCIAL  
-  
-    let respostaFinal = responseToUser;  
-  
-            if (resultadoConta) {  
-                respostaFinal += `\n\n🧠 O resultado da conta foi: ${resultadoConta}`;  
-            }  
-  
-            if (codeToUser) {  
-                addMsgWithCode(respostaFinal, codeToUser);  
-            } else {  
-                addMsg(respostaFinal, 'ai-msg');  
-            }  
-        }, 550);  
-  
-    } catch (err) {  
-removeTyping();  
-        addMsg("Erro crítico: Base de dados offline ou inexistente.", 'ai-msg');  
-    }  
-}  
-  
-// UI helpers  
-function addMsg(text, type) {  
-    const box = document.getElementById('chat-box');  
-    const m = document.createElement('div');  
-    m.className = `msg ${type}`;  
-    m.textContent = text;  
-    box.appendChild(m);  
-    box.scrollTop = box.scrollHeight;  
-}  
-  
-function addMsgWithCode(text, code) {  
-    const box = document.getElementById('chat-box');  
-    const m = document.createElement('div');  
-    m.className = 'msg ai-msg';  
-    m.innerHTML = `<div>${text}</div><button class="view-code-btn" onclick="openCodeModal(\`${code}\`)">Ver Código</button>`;  
-    box.appendChild(m);  
-    box.scrollTop = box.scrollHeight;  
-}  
-  
-function openCodeModal(code) {  
-    document.getElementById('code-modal').style.display = 'flex';  
-    document.getElementById('modal-code-text').textContent = code;  
-}  
-  
-function closeModal() {  
-    document.getElementById('code-modal').style.display = 'none';  
-}  
-  
-function handleFile(input) {  
-    const file = input.files[0];  
-    if (!file) return;  
-  
-    // 🔥 valida baseado na escolha do usuário  
-    if (selectedFileType === 'txt' && !file.name.endsWith(".txt")) {  
-        addMsg("⚠️ Você selecionou TXT, envie um arquivo .txt", "ai-msg");  
-        return;  
-    }  
-  
-    if (selectedFileType === 'html' && !file.name.endsWith(".html")) {  
-        addMsg("⚠️ Você selecionou HTML, envie um arquivo .html", "ai-msg");  
-        return;  
-    }  
-  
-    const reader = new FileReader();  
-  
-    reader.onload = function(e) {  
-        const content = e.target.result;  
-  
-        addMsg("📂 Arquivo recebido", "user-msg");  
-        addTyping();  
-  
-        setTimeout(() => {  
-            removeTyping();  
-  
-            // 📄 TXT → mostrar conteúdo  
-            if (selectedFileType === 'txt') {  
-arquivoTemporario = {   
-        nome: file.name,   
-        conteudo: content.split('\n'),   
-        ativo: true   
-    };  
-                addMsg("📄 Conteúdo do arquivo:\n\n" + content, "ai-msg");  
-            }  
-  
-            // 🌐 HTML → sandbox  
-            if (selectedFileType === 'html') {  
-                addMsg("🌐 Executando HTML em sandbox...", "ai-msg");  
-  
-                const box = document.getElementById('chat-box');  
-  
-                const iframe = document.createElement('iframe');  
-                iframe.style.width = "100%";  
-                iframe.style.height = "300px";  
-                iframe.style.border = "1px solid #333";  
-                iframe.style.borderRadius = "10px";  
-                iframe.style.marginTop = "10px";  
-  
-                // 🔒 SANDBOX (importante pra segurança)  
-                iframe.setAttribute("sandbox", "allow-scripts");  
-  
-                iframe.srcdoc = content;  
-  
-                box.appendChild(iframe);  
-                box.scrollTop = box.scrollHeight;  
-            }  
-  
-        }, 600);  
-    };  
-  
-    reader.onerror = function() {  
-        addMsg("Erro ao ler o arquivo.", "ai-msg");  
-    };  
-  
-    reader.readAsText(file);  
-}  
-  
-function baixarArquivoEditado() {  
-    const textoFinal = arquivoTemporario.conteudo.join('\n');  
-    const blob = new Blob([textoFinal], { type: 'text/plain' });  
-    const url = URL.createObjectURL(blob);  
-    const a = document.createElement('a');  
-    a.href = url;  
-    a.download = "editado_" + arquivoTemporario.nome;  
-    a.click();  
-    URL.revokeObjectURL(url);  
-}  
-  
-// ABRE O EDITOR  
-function abrirEditor() {  
-    if (!arquivoTemporario.ativo) {  
-        addMsg("⚠️ Nenhum arquivo carregado. Envie um .txt primeiro!", "ai-msg");  
-        return;  
-    }  
-      
-    document.getElementById('editor-modal').style.display = 'flex';  
-    document.getElementById('editor-filename').textContent = arquivoTemporario.nome;  
-      
-    // Junta o array de linhas em um texto único para o textarea  
-    document.getElementById('editor-textarea').value = arquivoTemporario.conteudo.join('\n');  
-}  
-  
-// FECHA SEM SALVAR  
-function fecharEditor() {  
-    document.getElementById('editor-modal').style.display = 'none';  
-}  
-  
-// SALVA O CONTEÚDO, ATUALIZA A MEMÓRIA E BAIXA  
-function salvarEFecharEditor() {  
-    const novoConteudo = document.getElementById('editor-textarea').value;  
-      
-    // Atualiza a memória da IA  
-    arquivoTemporario.conteudo = novoConteudo.split('\n');  
-      
-    // Fecha o modal  
-    fecharEditor();  
-      
-    // Avisa no chat  
-    addMsg("✅ Alterações salvas na memória. Iniciando download...", "ai-msg");  
-      
-    // Chama o download automático  
-    baixarArquivoEditado();  
-}  
-  
-// ATUALIZE o seu processarEdicao para entender o comando "editar"  
-function processarEdicao(comando) {  
-    const cmd = comando.toLowerCase();  
-      
-    if (cmd === "editar" || cmd === "editar arquivo" || cmd === "abrir editor") {  
-        abrirEditor();  
-        return "Abrindo editor de texto...";  
-    }  
-      
-    if (cmd.includes("baixar")) {  
-        if (!arquivoTemporario.ativo) return "Nenhum arquivo para baixar.";  
-        baixarArquivoEditado();  
-        return "Iniciando download...";  
-    }  
-  
-    return null;  
-}  
-let isVoiceMode = false;
-const synth = window.speechSynthesis;
-
-function toggleVoiceMode(active) {
-    isVoiceMode = active;
-    const screen = document.getElementById('voice-mode-screen');
-    screen.style.display = active ? 'flex' : 'none';
-    
-    if(active) {
-        startVoiceConversation();
-    } else {
-        synth.cancel();
-        recognition.stop();
-    }
-}
-
-// Função para a IA falar
-function speak(text) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'pt-BR';
-    utterance.rate = 1.1; // Um pouco mais rápido para parecer natural
-
-    utterance.onstart = () => {
-        document.getElementById('status-circle').className = 'ai-circle speaking';
-        document.getElementById('voice-status-text').textContent = "Ndj-AI falando...";
-    };
-
-    utterance.onend = () => {
-        document.getElementById('status-circle').className = 'ai-circle listening';
-        document.getElementById('voice-status-text').textContent = "Ouvindo você...";
-        recognition.start(); // Volta a ouvir assim que termina de falar
-    };
-
-    synth.speak(utterance);
-}
-
-function startVoiceConversation() {
-    document.getElementById('status-circle').className = 'ai-circle listening';
-    document.getElementById('voice-status-text').textContent = "Pode falar...";
-    recognition.start();
-}
-
-recognition.onresult = async (event) => {
-    const result = event.results[0][0].transcript;
-    
-    if(isVoiceMode) {
-        // Mostra o que o usuário falou no chat (por baixo do overlay)
-        addMsg(result, 'user-msg'); 
-        
-        recognition.stop();
-        document.getElementById('status-circle').className = 'ai-circle thinking';
-        document.getElementById('voice-status-text').textContent = "Processando...";
-        
-        const respostaDaIA = await buscarRespostaSilenciosa(result);
-        
-        // Mostra a resposta da IA no chat também
-        addMsg(respostaDaIA, 'ai-msg'); 
-        
-        speak(respostaDaIA);
-    } else {
-        document.getElementById('chatInput').value = result;
-    }
-};
-
-
-// Função auxiliar para buscar no JSON sem poluir o chat se quiser
-async function buscarRespostaSilenciosa(texto) {
-    const userText = normalizar(texto);
-    try {
-        const response = await fetch(`https://raw.githubusercontent.com/pitocoofc/jt/main/modelos/${currentPath}/respostas.json`);
-        const data = await response.json();
-        
-        let responseToUser = "";
-        let found = false;
-
-        // Percorre as keywords exatamente como no seu sendMessage
-        for (let keyGroup in data.keywords) {
-            const keys = keyGroup.split(',').map(k => normalizar(k));
-            if (keys.some(k => userText === k || userText.includes(k))) {
-                const item = data.keywords[keyGroup];
-                
-                // Trata a aleatoriedade do ';'
-                if (item.texto.includes(';')) {
-                    const frases = item.texto.split(';').map(f => f.trim());
-                    responseToUser = frases[Math.floor(Math.random() * frases.length)];
+                if (url.startsWith("https://") || url.startsWith("http://")) {
+                    document.getElementById("urlPrefix").innerText = "";
+                    document.getElementById("urlbar").value = url;
                 } else {
-                    responseToUser = item.texto;
+                    document.getElementById("urlPrefix").innerText = "ghostsearch.gt/";
+                    document.getElementById("urlbar").value = title;
                 }
-                found = true;
-                break;
-            }
+            };
+
+            const isSafe = SAFE_DOMAINS.some(d => url.includes(d));
+            if (url.startsWith("http") && !isSafe) {
+                toggleModal('security-modal', true);
+                typeWrite(`ALERTA CRÍTICO: Conexão externa disparada para [${url}]. Deseja ignorar sandbox de metadados do Ghost Search?`, "modalDesc");
+                document.getElementById("btnProceed").onclick = () => { toggleModal('security-modal', false); load(); };
+            } else { load(); }
         }
 
-        if (!found) {
-            // Trata o fallback com ';'
-            if (data.fallback.includes(';')) {
-                const fbs = data.fallback.split(';').map(f => f.trim());
-                responseToUser = fbs[Math.floor(Math.random() * fbs.length)];
+        function processInput(text) {
+            if(!text) return;
+            text = text.trim();
+            if (text.includes('.') && !text.includes(' ')) {
+                let url = text.startsWith('http') ? text : 'https://' + text;
+                openPage(url, text);
             } else {
-                responseToUser = data.fallback;
+                let engineUrl = ENGINES[currentEngine] || ENGINES["ghost"];
+                openPage(`${engineUrl}${encodeURIComponent(text)}`, text);
             }
         }
 
-        return responseToUser;
+        function navigate() { processInput(input.value); }
+        function handleBar(e) { if(e.key === 'Enter') processInput(document.getElementById("urlbar").value); }
+        function checkEnter(e) { if (e.key === 'Enter') navigate(); }
+        function quickNav(url) { openPage(url, url); }
 
-    } catch (err) {
-        console.error("Erro na busca silenciosa:", err);
-        return "Tive um problema ao acessar minha base de dados.";
-    }
-}
+        function goHome() {
+            hub.style.display = 'flex';
+            setTimeout(() => { hub.style.opacity = '1'; }, 5);
+            frame.style.display = 'none';
+            topbar.style.display = 'none';
+            frame.src = 'about:blank';
+            input.value = '';
+        }
 
-function ativarInterfaceV2() {
-    toggleFileMenu(); 
-    
-    // Mostra um aviso rápido antes de sair da página
-    addMsg("Redirecionando para Ndj-Neo v2...", "user-msg");
+        function goBack() {
+            if (frame.style.display === 'block') {
+                try {
+                    frame.contentWindow.history.back();
+                } catch(e) {
+                    console.log("Navegação segura restrita. Use o menu Home.");
+                }
+            }
+        }
 
-    setTimeout(() => {
-        // Esta é a função que move o usuário para o outro arquivo na mesma pasta
-        window.location.href = "app_structure.html";
-    }, 500);
-}
+        function openLocalFile() { window.location.href = "ia.html"; }
 
-  
-</script>  
-</body>    
+        function toggleModal(id, show) { 
+            document.getElementById(id).style.display = show ? 'flex' : 'none'; 
+            if(id === 'settings-modal' && show) populateSettingsFields();
+        }
+
+        // UPLOAD DE IMAGEM DA GALERIA
+        function handleImageUpload(inputEl) {
+            const file = inputEl.files[0];
+            if (file) {
+                document.getElementById("file-label").innerText = `✓ ${file.name}`;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    base64BgData = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function populateSettingsFields() {
+            const rootStyles = getComputedStyle(document.documentElement);
+            document.getElementById("cfgPrimary").value = rootStyles.getPropertyValue('--primary').trim();
+            document.getElementById("cfgSearchEngine").value = currentEngine;
+            renderShortcutManager();
+        }
+
+        function saveConfigurations() {
+            const primaryColor = document.getElementById("cfgPrimary").value;
+            currentEngine = document.getElementById("cfgSearchEngine").value;
+
+            localStorage.setItem("ghost_ndj_primary", primaryColor);
+            localStorage.setItem("ghost_ndj_engine", currentEngine);
+            localStorage.setItem("ghost_ndj_shortcuts", JSON.stringify(userShortcuts));
+            if(base64BgData) localStorage.setItem("ghost_ndj_bg_gallery", base64BgData);
+
+            applyTheme(primaryColor, base64BgData);
+            renderShortcuts();
+            toggleModal('settings-modal', false);
+        }
+
+        function applyTheme(primary, bgData) {
+            document.documentElement.style.setProperty('--primary', primary);
+            if(bgData) {
+                document.documentElement.style.setProperty('--bg-image', `url('${bgData}')`);
+            }
+        }
+
+        function loadSavedSettings() {
+            const savedPrimary = localStorage.getItem("ghost_ndj_primary") || "#3b82f6";
+            currentEngine = localStorage.getItem("ghost_ndj_engine") || "ghost";
+            base64BgData = localStorage.getItem("ghost_ndj_bg_gallery") || "";
+            
+            const savedShortcuts = localStorage.getItem("ghost_ndj_shortcuts");
+            if(savedShortcuts) userShortcuts = JSON.parse(savedShortcuts);
+            else userShortcuts = [...defaultShortcuts];
+
+            applyTheme(savedPrimary, base64BgData);
+        }
+
+        function updateThemePreview() {
+            const primaryColor = document.getElementById("cfgPrimary").value;
+            document.documentElement.style.setProperty('--primary', primaryColor);
+        }
+
+        // GERENCIADOR DE ATALHOS RÁPIDOS
+        function renderShortcuts() {
+            const container = document.getElementById("shortcuts-display");
+            container.innerHTML = "";
+            userShortcuts.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "shortcut-item";
+                div.onclick = () => quickNav(item.url);
+                div.innerHTML = `
+                    <div class="icon-circle">${item.icon || "🌐"}</div>
+                    <span style="font-size:12px; opacity:0.85; font-weight: 500;">${item.name}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderShortcutManager() {
+            const listContainer = document.getElementById("shortcut-manager-list");
+            listContainer.innerHTML = "";
+            if(userShortcuts.length === 0) {
+                listContainer.innerHTML = `<div style="font-size:12px; color:#666; text-align:center; padding:5px;">Sem atalhos</div>`;
+                return;
+            }
+            userShortcuts.forEach((item, index) => {
+                const row = document.createElement("div");
+                row.className = "shortcut-manager-item";
+                row.innerHTML = `
+                    <span>${item.name} <span style="color:#555; font-size:11px;">(${item.url.replace(/^https?:\/\//,'')})</span></span>
+                    <button class="del-shortcut-btn" onclick="deleteShortcut(${index})">✕</button>
+                `;
+                listContainer.appendChild(row);
+            });
+        }
+
+        function addNewShortcut() {
+            const nameInp = document.getElementById("new-short-name");
+            const urlInp = document.getElementById("new-short-url");
+            let name = nameInp.value.trim();
+            let url = urlInp.value.trim();
+            if(!name || !url) return;
+            if(!url.startsWith("http")) url = "https://" + url;
+            let icon = url.includes("youtube.com") ? "▶️" : (url.includes("github.com") ? "🐙" : "🌐");
+            userShortcuts.push({ name, url, icon });
+            nameInp.value = ""; urlInp.value = "";
+            renderShortcutManager();
+        }
+
+        function deleteShortcut(index) {
+            userShortcuts.splice(index, 1);
+            renderShortcutManager();
+        }
+
+        async function sharePage() {
+            const currentUrl = frame.style.display === 'block' ? frame.src : window.location.href;
+            try {
+                if (navigator.share) await navigator.share({ title: 'Ghost-NDJ Browser', url: currentUrl });
+                else { navigator.clipboard.writeText(currentUrl); alert("Copiado!"); }
+            } catch (err) {}
+        }
+    </script>
+</body>
 </html>
